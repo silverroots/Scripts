@@ -1,0 +1,8 @@
+date >> /home/silverroots/.ssh/logs
+who  >> /home/silverroots/.ssh/logs
+echo ---------------------------------------- >> /home/silverroots/.ssh/logs
+echo `who | awk '{print $5}' | grep local` | wall
+export DISPLAY=:0
+#/usr/bin/zenity  --warning  --text="`who | awk '{print $5}' | uniq`" --title="SSH Warning"
+notify-send "`who | awk '{print $5}' | uniq`" -t 15000
+

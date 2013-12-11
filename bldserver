@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ $1 = "ca" ]
+then
+    echo "Connecting to Sunnyvale - CA88 Linux 04 Build Server..."
+    ssh -c blowfish hwn634@ca88lnxdroid04.am.mot.com
+elif [ $1 = "pune" ]
+then
+    echo "Connecting to Pune - ZIN66 Linux 02 Build Server..."
+    ssh -c blowfish hwn634@zin66bld02.miel.mot.com
+elif [ $1 = "agni" ]
+then
+    echo "Connecting to Agni - Pune Build Server..."
+    ssh -X -c blowfish hwn634@agni.local
+elif [ $1 = "android" ]
+then
+    echo "Connectiong to Android Build Server - Pune..."
+    ssh -c blowfish hwn634@zin66androidbld09.miel.mot.com
+fi
+

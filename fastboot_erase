@@ -1,0 +1,17 @@
+#!/bin/sh
+fastboot devices
+fastboot erase cdt
+fastboot erase mbr
+fastboot erase ebr
+fastboot erase logo
+fastboot erase boot
+fastboot erase devtree
+fastboot erase system
+fastboot erase cdrom
+fastboot erase preinstall
+fastboot erase recovery
+fastboot -w erase cache
+fastboot erase radio
+REM fastboot_wt -m 256 erase webtop
+fastboot erase webtop
+fastboot reboot-bootloader

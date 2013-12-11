@@ -1,0 +1,28 @@
+$ sudo sh /usr/share/ati/fglrx-uninstall.sh
+$ sudo apt-get remove --purge fglrx fglrx_* fglrx-amdcccle* fglrx-dev*
+$ sudo rm /etc/X11/xorg.conf
+$ sudo apt-get install --reinstall libgl1-mesa-glx:i386 libgl1-mesa-dri:i386 xserver-xorg-core
+$ sudo dpkg-reconfigure xserver-xorg
+$ sudo reboot
+$ mkdir ~/catalyst12.4/
+$ cd ~/catalyst12.4/
+
+Download the appropriate driver for your machine here from the AMD/ATI Website and move it in ~/catalyst12.4/ . File should be something like amd-driver-installer-12-4-x86.x86_64.run
+
+$ chmod +x amd-driver-installer-12-4-x86.x86_64.run
+$ ./amd-driver-installer-12-4-x86.x86_64.run --extract driver
+$ cd ~/catalyst12.4/driver/common/lib/modules/fglrx/build_mod/
+$ wget -O fglrx.patch http://ubuntuone.com/5gNgEmVfzs3ytD5QZ2YGCi
+$ patch -p1 < fglrx.patch
+$ cd ~/catalyst12.4/driver/
+$ ./ati-installer.sh 8.961 --buildpkg Ubuntu/precise
+$ cd ~/catalyst12.4/
+$ sudo dpkg -i fglrx*.deb
+$ sudo amdconfig --initial -f
+$ sudo reboot
+$ fglrxinfo
+   display: :0.0  screen: 0
+      OpenGL vendor string: Advanced Micro Devices, Inc.
+         OpenGL renderer string: ATI Mobility Radeon HD 4200 Series
+            OpenGL version string: 3.3.11631 Compatibility Profile Context
+

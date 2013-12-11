@@ -1,0 +1,18 @@
+#! /bin/bash
+# Description: Script to grab weather feed from BBC. Requires curl installed.
+# Author: Dave MacLeod
+# Date: 12 Jan 2009
+
+# To find the correct URL for your location, go to http://www.bbc.co.uk/weather and type in the place name or UK postcode.
+# look for the link "Latest observations feed". Right click this link and choose "copy link location". Paste this into the URL field below.
+# for example my work location, M3 3HN, gives http://feeds.bbc.co.uk/weather/feeds/rss/obs/id/2634.xml
+# weather in Munich, Germany is at http://feeds.bbc.co.uk/weather/feeds/rss/obs/world/0053.xml
+# to use in conky, edit .conkyrc and add the following line;
+# ${execi 600 /home/davmac/Applications/scripts/bbcweather | fold -s -w60}
+# NB: the 600 runs it every 10 mins, the fold -s -w60 wraps the lines at spaces a 60 columns wide
+ 
+# get the data, select the line with "Temperature" and tidy up the rest
+curl -s --connect-timeout 30 "http://feeds.bbc.co.uk/weather/feeds/rss/obs/world/2508.xml" | grep "Temperature" | sed -e 's/&#xB0;/ deg /g' | sed -e 's/&#37;/%/g'
+
+exit 0
+
