@@ -13,8 +13,8 @@ usage() {
     echo "        --inspect      Setups the device to enable Remote Web Inspector"
 }
 
-TIZEN_BINARIES_ROOT=/home/user/tizenBinaries/
-OSCE_ROOT=/home/user/osce/osce-root/
+TIZEN_BINARIES_ROOT=$HOME/codespace/tizenBinaries/
+OSCE_ROOT=$HOME/codespace/osce-root/
 
 
 TARGET_BINARIES_LOCATION=${TIZEN_BINARIES_ROOT}latest/
@@ -38,6 +38,7 @@ buildTarget() {
         buildArgs="$buildArgs --offline"
     fi
 
+    echo $buildArgs
     osce build armv7el $buildArgs
     sudo rm -rf ${TIZEN_BINARIES_ROOT}latest
     mkdir -p ${TIZEN_BINARIES_ROOT}latest
@@ -63,13 +64,12 @@ setupDebugging() {
 }
 
 pushAndInstall() {
-    REMOTE_BINARY_DIR=/opt/media/browserBinary/
-
+    REMOTE_BINARY_DIR=/opt/usr/media/browserBinary/
+    sdb shell change-booting-mode.sh --update
     sdb shell rm -rf $REMOTE_BINARY_DIR
     sdb shell mkdir -p $REMOTE_BINARY_DIR
 
     sdb push ${TARGET_BINARIES_LOCATION}${INSTAL_BINARY_NAME} $REMOTE_BINARY_DIR
-    sdb shell change-booting-mode.sh --update
     sdb shell rpm -Uvh --force ${REMOTE_BINARY_DIR}${INSTAL_BINARY_NAME}
 
     # Install on local machine as well
