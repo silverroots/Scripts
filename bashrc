@@ -105,15 +105,43 @@ fi
 # ################################################ MY CHANGES ############################################
 
 # -- Show the Current GIT Branch in Your Command Prompt --- #
+
+function determine_webkit_trunk_revision() {
+    git log -n1 2> /dev/null | grep git-svn-id -m 1 | awk -F '@' '{print $2}' | awk '{print "@"$1}'
+}
+
 function parse_git_branch () {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    branch=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/')
+    if [[ $branch == \(cl* ]];
+        then
+        reviewId=`echo ${branch:3:8}`
+        echo -n "http://crrev.com/$reviewId "
+    fi
+    if [ "$branch" = "(master)" -o "$branch" = "(trunk)" ];
+        then
+        tput smul
+        tput bold
+    fi
+    echo $branch
+}
+
+function is_building_for_android() {
+    if [ "$ANDROID_SDK_BUILD" = "1" ]; then
+        case $PWD/ in
+            $CHROME_SRC/*) echo "Android Build";
+        esac
+    fi
 }
 
 RED="\[\033[0;31m\]"
 YELLOW="\[\033[0;33m\]"
 GREEN="\[\033[0;32m\]"
 NO_COLOUR="\[\033[0m\]"
-PS1="$GREEN\u$NO_COLOUR@$RED\h$NO_COLOUR:\w$YELLOW\$(parse_git_branch)$NO_COLOUR\$ "
+#PS1="$GREEN\u$NO_COLOUR@$RED\h$NO_COLOUR:\w$YELLOW\$(parse_git_branch)$NO_COLOUR\$ "
+PS1="\[\033[0;37m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} == 0 ]]; then echo '\[\033[0;31m\]\h'; else echo '\[\033[0;33m\]\u\[\033[0;37m\]@\[\033[0;96m\]\h'; fi)\[\033[0;37m\]]\342\224\200[\[\033[0;32m\]\w$RED \$(parse_git_branch)$YELLOW \$(is_building_for_android)$NO_COLOUR\[\033[0;37m\]]\n\[\033[0;37m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]$ "
+
+
+#PS1="\n\[\033[1;37m\]\342\224\214($(if [[ ${EUID} == 0 ]]; then echo '\[\033[01;31m\]\h'; else echo '\[\033[01;34m\]\u@\h'; fi)\[\033[1;37m\])\342\224\200(\$(if [[ \$? == 0 ]]; then echo \"\[\033[01;32m\]\342\234\223\"; else echo \"\[\033[01;31m\]\342\234\227\"; fi)\[\033[1;37m\])\342\224\200(\[\033[1;34m\]\@ \d\[\033[1;37m\])\[\033[1;37m\]\n\342\224\224\342\224\200(\[\033[1;32m\]\w\[\033[1;37m\])\342\224\200(\[\033[1;32m\]\$(ls -1 | wc -l | sed 's: ::g') files, \$(ls -lah | grep -m 1 total | sed 's/total //')b\[\033[1;37m\])\342\224\200> \[\033[0m\]"
 
 # ------------------------------ #
 
@@ -145,3 +173,22 @@ export PATH=$PATH:$HOME/tizen-sdk/tools
 
 #Tizen obs build
 export PATH=$PATH:$HOME/codespace/obs-build
+
+# Alias
+alias wk='cd $HOME/codespace/WebKit-OS/WebKit'
+alias cr='cd $HOME/codespace/chromium/src'
+alias gp='git pull'
+alias gst='git status'
+alias gs='git show'
+alias gd='git diff'
+alias gc='git commit'
+alias gg='git grep'
+alias ga='git add'
+alias rb='remoteDebugging.sh --build'
+alias rbo='remoteDebugging.sh --build --online'
+alias ri='remoteDebugging.sh --install'
+alias rie='remoteDebugging.sh --install --external'
+alias crb='ninja -C out/Debug'
+
+# Chrome Sandbox
+export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
