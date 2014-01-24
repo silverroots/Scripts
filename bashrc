@@ -175,15 +175,10 @@ export PATH=$PATH:$HOME/tizen-sdk/tools
 export PATH=$PATH:$HOME/codespace/obs-build
 
 # Alias
+alias cd="cd -P"
 alias wk='cd $HOME/codespace/WebKit-OS/WebKit'
+alias tw='cd $HOME/codespace/webkit-efl'
 alias cr='cd $HOME/codespace/chromium/src'
-alias gp='git pull'
-alias gst='git status'
-alias gs='git show'
-alias gd='git diff'
-alias gc='git commit'
-alias gg='git grep'
-alias ga='git add'
 alias rb='remoteDebugging.sh --build'
 alias rbo='remoteDebugging.sh --build --online'
 alias ri='remoteDebugging.sh --install'
@@ -192,3 +187,6 @@ alias crb='ninja -C out/Debug'
 
 # Chrome Sandbox
 export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
+
+export https_proxy="http://107.108.85.10:80"
+export http_proxy="http://107.108.85.10:80"
