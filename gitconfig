@@ -1,0 +1,28 @@
+[user]
+	name = Kaustubh Atrawalkar
+	email = kaustubh.a@samsung.com
+[core]
+	editor = vim
+	autocrlf = false
+	filemode = false
+	deltaBaseCacheLimit = 1G
+[merge]
+	tool = vimdiff
+[color]
+	status = auto
+	branch = auto
+	interactive = auto
+	diff = auto
+	ui = auto
+[color "diff"]
+	whitespace = red reverse
+[diff]
+	tool = meld
+[alias]
+	cs = commit -s
+	ad = add -v
+	ch = checkout
+	sh = show
+	st = status
+	pu = pull
+	df = diff
