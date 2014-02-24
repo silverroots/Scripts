@@ -1,0 +1,20 @@
+{
+  "cmd": ["ninja", "-j200", "-C", "out/Release", "content_shell"],
+  "working_dir": "${project_path}/src",
+  "path": "$PATH:$HOME/codespace/depot_tools",
+  "variants":
+  [
+    {
+      "cmd": ["ninja", "-j200", "-C", "out/Debug", "chrome"],
+      "name": "chrome"
+    },
+    {
+      "cmd": ["ninja", "-j200", "-C", "out/Debug", "libsbrowser"],
+      "name": "libsbrowser"
+    },
+    {
+      "cmd": ["ninja", "-j200", "-C", "out/Release", "content_unittests"],
+      "name": "content_unittests"
+    },
+  ]
+}

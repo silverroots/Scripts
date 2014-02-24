@@ -13,8 +13,8 @@ HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=5000
+HISTFILESIZE=10000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -176,17 +176,26 @@ export PATH=$PATH:$HOME/codespace/obs-build
 
 # Alias
 alias cd="cd -P"
-alias wk='cd $HOME/codespace/WebKit-OS/WebKit'
-alias tw='cd $HOME/codespace/webkit-efl'
-alias cr='cd $HOME/codespace/chromium/src'
+alias v='vim'
+
+alias gcam='git commit --amend --date="$(date -R)"'
+alias gshf='git show --pretty="format:" --name-only'
+
+alias wk='cd -P $HOME/codespace/WebKit-OS/WebKit'
+alias tw='cd -P $HOME/codespace/webkit-efl'
+alias cr='cd -P $HOME/codespace/chromium/src'
+alias blink='cd -P $HOME/codespace/chromium/src/third_party/WebKit'
+
 alias rb='remoteDebugging.sh --build'
 alias rbo='remoteDebugging.sh --build --online'
 alias ri='remoteDebugging.sh --install'
 alias rie='remoteDebugging.sh --install --external'
-alias crb='ninja -C out/Debug'
 
 # Chrome Sandbox
 export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
 
-export https_proxy="http://107.108.85.10:80"
-export http_proxy="http://107.108.85.10:80"
+#export https_proxy="http://107.108.85.10:80"
+#export http_proxy="http://107.108.85.10:80"
+
+#export http_proxy="http://168.219.61.252:8080"
+#export https_proxy="http://168.219.61.252:8080"
