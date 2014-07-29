@@ -1,28 +1,202 @@
 [user]
 	name = Kaustubh Atrawalkar
-	email = kaustubh.a@samsung.com
-[core]
-	editor = vim
-	autocrlf = false
-	filemode = false
-	deltaBaseCacheLimit = 1G
-[merge]
-	tool = vimdiff
-[color]
-	status = auto
-	branch = auto
-	interactive = auto
-	diff = auto
-	ui = auto
-[color "diff"]
-	whitespace = red reverse
-[diff]
-	tool = meld
+	email = kaustubh.ra@gmail.com
+
 [alias]
-	cs = commit -s
-	ad = add -v
-	ch = checkout
-	sh = show
-	st = status
-	pu = pull
-	df = diff
+	a = add
+	aa = add --all
+	ae = add --edit
+	ai = add --interactive
+	amend = commit --amend -C HEAD
+	ap = add --patch
+	au = add --update
+	authors = "!git log --pretty=format:%aN | sort | uniq -c | sort -rn"
+	b = branch -vv
+	c = commit
+	ca = commit --amend
+	changes = diff --name-status -r
+	check = diff --check
+	cm = commit --message
+	co = checkout
+	cpc = cherry-pick
+	create-branch = !sh -c 'git push origin HEAD:refs/heads/$1 && git fetch origin && git branch --track $1 origin/$1 && cd . && git checkout $1' -
+	current-branch = rev-parse --abbrev-ref HEAD
+	d = diff --ignore-all-space
+	dc = diff --cached --ignore-all-space
+	delete-branch = !sh -c 'git push origin :refs/heads/$1 && git remote prune origin && git branch -D $1' -
+	div = divergence
+	dt = difftool
+	h = help
+	irb = rebase --interactive
+	list-aliases = "!git config -l | grep alias | cut -c 7-"
+	la = "!git list-aliases"
+	ls-ignored = ls-files --exclude-standard --ignored --others
+	markdown = !BN=$(git name-rev --name-only HEAD) && git log --no-merges --grep=$BN --pretty=oneline | awk -F"$BN: " '{print \"-\", $NF}' | uniq
+	# Create an empty commit, only having a commit message
+	msg = commit --allow-empty -m
+	p = cherry-pick -s
+	pick = cherry-pick
+	pr = !hub pull-request
+	prune-remotes = "!for remote in `git remote`; do git remote prune $remote; done"
+	r = remote
+	rh = reset --hard
+	ru = remote update --prune
+	s = status --short --branch
+	sm = submodule
+	sma = submodule add
+	smu = submodule update --init
+	undo = reset --soft HEAD@{1}
+	wd = diff --word-diff="color"
+	wdc = diff --word-diff="color" --cached
+	push = push --tags
+
+	# Make stashing easier
+	st = stash
+	stl = stash list
+	stp = stash pop
+
+	# Make rebasing easier
+	rb = rebase
+	rba = rebase --abort
+	rbc = rebase --continue
+	rbs = rebase --skip
+
+	# Easier merging
+	m = merge -s recursive -X patience
+	mm = merge --no-ff
+	merge-branch = !git checkout master && git merge @{-1}
+	conflicted = grep --name-only --full-name '<<<<<<< HEAD'
+	# Pick our version of a file while merging
+	ours = "!f() { git co --ours $@ && git add $@; }; f"
+	# Pick their version of a file while merging
+	theirs = "!f() { git co --theirs $@ && git add $@; }; f"
+
+	# Inspect history in various ways
+	news = log -p HEAD@{1}..HEAD@{0}
+	sl = shortlog
+	# Show compact history
+	l = "!git log --graph --pretty='tformat:%C(yellow)%h{%C(green)%ar{%C(bold blue)%an{%C(red)%d%C(reset) %s' $* | column -t -s '{' | less -FXRS"
+	# Show commit log using graph notation
+	lg = log --graph --pretty=format:'%Cred%h%Creset %an -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+	# List commits showing changed files
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	ra = log --graph --abbrev-commit --date=relative -20 --all --pretty='format:%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset'
+
+	# See all the commits related to a file
+	filelog = log -u
+	fl = log -u
+
+	# Easily ignore committed, but changed files that I don't want to commit
+	assume = update-index --assume-unchanged
+	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
+	assumeall = "!git st -s | awk {'print $2'} | xargs git assume"
+	unassume = update-index --no-assume-unchanged
+	unassumeall = "!git assumed | xargs git update-index --no-assume-unchanged"
+
+[advice]
+	pushNonFastForward = false
+	statusHints = false
+
+
+[apply]
+	whitespace = nowarn
+
+
+[pager]
+	color = true
+
+
+[branch]
+	autosetupmerge = true
+
+
+[color]
+	ui = auto
+
+
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
+
+
+[svn]
+	brokenSymlinkWorkaround = false
+
+
+[push]
+	default = simple
+
+
+[pull]
+	rebase = true
+
+
+[help]
+	autocorrect = 0
+
+
+
+[rerere]
+	enabled = 1
+
+
+[difftool "Kaleidoscope"]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+
+
+[diff]
+	renames = copies
+	mnemonicprefix = true
+	tool = Kaleidoscope
+	algorithm = histogram
+
+
+[difftool]
+	prompt = false
+
+
+[mergetool "Kaleidoscope"]
+	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustExitCode = true
+
+
+[merge]
+	stat = true
+	diff = vimdiff
+	tool = Kaleidoscope
+
+
+[mergetool]
+	prompt = false
+
+
+[rebase]
+	autosquash = true
+
+
+[diff "zip"]
+	textconv = unzip -c -a
+
+
+[github]
+	user = cypher
+
+
+[credential]
+	helper = osxkeychain
+
+
+[status]
+	submodulesummary = true
