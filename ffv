@@ -1,0 +1,3 @@
+#!/bin/bash
+files=`find . -iname "*$1*" -not -regex ".*\.[o\d]$"`
+vim -o $files
