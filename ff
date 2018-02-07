@@ -1,2 +1,2 @@
 #!/bin/sh
-find . -iname "*$1*" -not -regex ".*\.[o\d]$"
+find . -iname "*$1*" -not -regex ".*\.[o\d]$" -not -regex ".*\.class$" -not -regex ".*\.luac$" -not -regex ".*\.dia$" -and \( -type l -or -type f \)

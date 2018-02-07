@@ -80,11 +80,14 @@ fi
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
-alias l='ls -CF'
+
+# For Linux Use below script for alert.
+#alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+# alias alert="osascript -e 'display notification $([ $? = 0 ] && echo terminal || echo error)" with title "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//')"''
+
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -104,98 +107,132 @@ fi
 
 # ################################################ MY CHANGES ############################################
 
+# Set dir colors
+#LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=01;05;37;41:mi=01;05;37;41:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mng=01;35:*.pcx=01;35:*.yuv=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.pdf=00;32:*.ps=00;32:*.txt=00;32:*.patch=00;32:*.diff=00;32:*.log=00;32:*.tex=00;32:*.doc=00;32:*.flac=01;35:*.mp3=01;35:*.mpc=00;36:*.ogg=00;36:*.wav=00;36:*.mid=00;36:*.midi=00;36:*.au=00;36:*.flac=00;36:*.aac=00;36:*.ra=01;36:*.mka=01;36:';
+export LSCOLORS=gxfxcxdxbxegedabagacad
+
 # -- Show the Current GIT Branch in Your Command Prompt --- #
 
-function determine_webkit_trunk_revision() {
-    git log -n1 2> /dev/null | grep git-svn-id -m 1 | awk -F '@' '{print $2}' | awk '{print "@"$1}'
-}
+BGREEN="\[\033[1;32m\]"
+GREEN="\[\033[0;32m\]"
+NO_COLOUR="\[\033[0m\]"
+RED="\[\033[0;31m\]"
+YELLOW="\[\033[0;33m\]"
 
 function parse_git_branch () {
     branch=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/')
-    if [[ $branch == \(cl* ]];
-        then
-        reviewId=`echo ${branch:3:8}`
-        echo -n "http://crrev.com/$reviewId "
-    fi
-    if [ "$branch" = "(master)" -o "$branch" = "(trunk)" ];
-        then
-        tput smul
-        tput bold
-    fi
     echo $branch
 }
 
-function is_building_for_android() {
-    if [ "$ANDROID_SDK_BUILD" = "1" ]; then
-        case $PWD/ in
-            $CHROME_SRC/*) echo "Android Build";
-        esac
+function show_status_bubble() {
+    terminal_status_bubble=""
+    status_color="2"
+    if [[ "$GYP_DEFINES" =~ "OS=android" ]]; then
+        if [[ $PWD =~ ^$CHROME_SRC.* ]]
+        then 
+            status_color=2
+            terminal_status_bubble="[AB]"
+        else
+            status_color=3
+            terminal_status_bubble="[AB !pwd]"
+        fi
     fi
+    if [[ "$GYP_DEFINES" =~ "fastbuild=2" ]]; then
+        terminal_status_bubble="$terminal_status_bubble [FB@2]"
+    fi
+    if [[ "$GYP_DEFINES" =~ "clang=1" ]]; then
+        terminal_status_bubble="$terminal_status_bubble [clang]"
+    fi
+    tput setab $status_color; echo "$terminal_status_bubble";
 }
 
-RED="\[\033[0;31m\]"
-YELLOW="\[\033[0;33m\]"
-GREEN="\[\033[0;32m\]"
-NO_COLOUR="\[\033[0m\]"
-#PS1="$GREEN\u$NO_COLOUR@$RED\h$NO_COLOUR:\w$YELLOW\$(parse_git_branch)$NO_COLOUR\$ "
-PS1="\[\033[0;37m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} == 0 ]]; then echo '\[\033[0;31m\]\h'; else echo '\[\033[0;33m\]\u\[\033[0;37m\]@\[\033[0;96m\]\h'; fi)\[\033[0;37m\]]\342\224\200[\[\033[0;32m\]\w$RED \$(parse_git_branch)$YELLOW \$(is_building_for_android)$NO_COLOUR\[\033[0;37m\]]\n\[\033[0;37m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]$ "
+# --------- Different versions of Command Prompt --------- #
 
+#PS1="$GREEN\u@\h: $YELLOW\w $RED\$(parse_git_branch)$NO_COLOUR \$(show_status_bubble)$GREEN \$(date +\"%d:%m:%y %T\")$NO_COLOUR\n\$ "
+#export PS1="$GREEN\u@\h: $YELLOW\w $RED\$(parse_git_branch)$NO_COLOUR \$(show_status_bubble)$NO_COLOUR\n\$ "
+#PS1="\[\e[32;1m\]\u\[\e[0m\]\[\e[32m\]@\h \[\e[36m\]\w \[\e[33m\]\$ \[\e[0m\]"
+
+PS1="\[\033[0;37m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} == 0 ]]; then echo '\[\033[0;31m\]\h'; else echo '\[\033[0;33m\]\u\[\033[0;37m\]@\[\033[0;96m\]\h'; fi)\[\033[0;37m\]]\342\224\200[\[\033[0;32m\]\w$RED \$(parse_git_branch)$NO_COLOUR\[\033[0;37m\]]\n\[\033[0;37m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]$ "
 
 #PS1="\n\[\033[1;37m\]\342\224\214($(if [[ ${EUID} == 0 ]]; then echo '\[\033[01;31m\]\h'; else echo '\[\033[01;34m\]\u@\h'; fi)\[\033[1;37m\])\342\224\200(\$(if [[ \$? == 0 ]]; then echo \"\[\033[01;32m\]\342\234\223\"; else echo \"\[\033[01;31m\]\342\234\227\"; fi)\[\033[1;37m\])\342\224\200(\[\033[1;34m\]\@ \d\[\033[1;37m\])\[\033[1;37m\]\n\342\224\224\342\224\200(\[\033[1;32m\]\w\[\033[1;37m\])\342\224\200(\[\033[1;32m\]\$(ls -1 | wc -l | sed 's: ::g') files, \$(ls -lah | grep -m 1 total | sed 's/total //')b\[\033[1;37m\])\342\224\200> \[\033[0m\]"
 
 # ------------------------------ #
 
 export REAL_NAME="Kaustubh Atrawalkar"
-export GREP_OPTIONS="--exclude-dir="\*/.svn/\*""
-export EMAIL_ADDRESS=kaustubh.a@samsung.com
+export GREP_OPTIONS="--exclude-dir="\*/.git/\*""
+export EMAIL_ADDRESS=katrawalkar@mz.com
 
 # My Scripts
-export PATH=$PATH:$HOME/Scripts
+#export PATH="/opt/local/bin:/usr/local/bin:$PATH:$HOME/Scripts"
 
 # chromium depot_tools
-export PATH=$PATH:$HOME/codespace/depot_tools
-
-# Android tools
-export PATH=${PATH}:~/android-sdk/tools
-export PATH=${PATH}:~/android-sdk/platform-tools
-export ANDROID_SDK_ROOT=$HOME/android-sdk
-# export ANDROID_NDK_ROOT=$HOME/android-ndk
+#export PATH=$PATH:$HOME/codespace/depot_tools
 
 # ccahe
 # export PATH=~/bin:${PATH}
 # export USE_CCACHE=1
 
-# Tizen SDK configuration
-# This is generated by Tizen SDK. Please do not modify by yourself.
-# Set sdb environment path
-export PATH=$PATH:$HOME/tizen-sdk/tools
-# End Tizen SDK configuration
-
-#Tizen obs build
-export PATH=$PATH:$HOME/codespace/obs-build
-
 # Alias
 alias cd="cd -P"
-alias v='vim'
+alias v='vimi'
+alias lr="cd /projects/ixengine/shared/librocket"
+alias writelanguage='/projects/odyssey/server/_ix/scripts/write_language_files.php'
+alias engine='cd /projects/ixengine'
+alias ody='cd /projects/odyssey'
+#alias wisologs='tail -f /opt/local/var/log/nginx/error.log /projects/odyssey/log/wiso_dev.log | color_server_log.sh'
+#alias odylogs='tail -f /opt/local/var/log/nginx/error.log /projects/odyssey/log/ody_dev.log | color_server_log.sh'
+#alias nisologs='tail -f /opt/local/var/log/nginx/error.log /projects/odyssey/log/niso_dev.log | color_server_log.sh'
 
-alias gcam='git commit --amend --date="$(date -R)"'
+alias wisologs='diva logs wiso | color_server_log.sh'
+alias baw="(cd /projects/ixengine/games/wiso/android; ./gradlew installWisoiapArmv7Debug)"
+
+# ls aliases
+alias ls="ls -hG"
+alias l="ls -lhG"
+alias la="ls -lahG"
+alias ..='cd ..'
+alias -- -='cd -'
+
+# git aliases
+alias gl='tig'
+alias gcam='git commit --amend --reset-author --date="$(date)"'
 alias gshf='git show --pretty="format:" --name-only'
 
-alias wk='cd -P $HOME/codespace/WebKit-OS/WebKit'
-alias tw='cd -P $HOME/codespace/webkit-efl'
-alias cr='cd -P $HOME/codespace/chromium/src'
-alias blink='cd -P $HOME/codespace/chromium/src/third_party/WebKit'
+# Some fancy history stuff
+export HISTCONTROL=erasedups  # No duplicates
+export HISTSIZE=              # Bigger history
+shopt -s histappend # Append to ~/.bash_history
+alias h='history | grep' # Easy history grep
 
-alias rb='remoteDebugging.sh --build'
-alias rbo='remoteDebugging.sh --build --online'
-alias ri='remoteDebugging.sh --install'
-alias rie='remoteDebugging.sh --install --external'
+export NDK_MODULE_PATH=/projects/ixengine/shared:/tools/android
+launchctl setenv NDK_MODULE_PATH $NDK_MODULE_PATH
 
-# Chrome Sandbox
-export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
+export SDK_MODULE_PATH=/tools/android/android-sdk
 
-#export https_proxy="http://107.108.85.10:80"
-#export http_proxy="http://107.108.85.10:80"
+launchctl setenv NDK_MODULE_PATH $NDK_MODULE_PATH
 
-#export http_proxy="http://168.219.61.252:8080"
-#export https_proxy="http://168.219.61.252:8080"
+#export DISTCC_DIR=/tools/distcc
+#launchctl setenv DISTCC_DIR $DISTCC_DIR
+
+export PATH=/tools/python/macosx-10.12/bin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/bin:/usr/sbin:/sbin:/usr/bin:/tools/android/android-ndk:/tools/android/android-sdk/tools:/tools/android/android-sdk/platform-tools:/tools/android/bin:$HOME/Scripts:/usr/local/go/bin:/tools/bin:$PATH
+launchctl setenv PATH $PATH
+
+# Shell Intergration for iTerm 3 (MacOS)
+source ~/.iterm2_shell_integration.`basename $SHELL`
+
+# find file(s) and open them in vim
+function ffv() {
+    vim -o `ff $1`
+}
+
+# chainge to the directory of the first of the found files
+function ffd() {
+    cd `ff $1 | head -n 1 | xargs dirname`
+}
+
+# ssh into featurebranch
+sshfeaturefunction() {
+local env=$(printf %d $1)
+/usr/bin/ssh -o LogLevel=error -t las1-1-002.idm.mz-inc.com "/usr/local/bin/ssh_as_root isofeature-$env-001.iso.dev.las1.mz-inc.com"
+}
+alias sshfeature=sshfeaturefunction
